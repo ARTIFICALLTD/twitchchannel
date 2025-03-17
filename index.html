@@ -38,10 +38,12 @@
                 const videoFrame = document.getElementById("videoFrame");
                 const waitingText = document.getElementById("waitingText");
 
-                // Eğer `data.video` boşsa veya geçersizse iframe'i göstermemesi için kontrol ekleyelim
-                if (data.video && data.video.includes("youtube.com/watch?v=")) {
+                // Boş veya geçersiz video URL'sini kontrol edelim
+                if (data.video && data.video.trim() !== "" && data.video.includes("youtube.com/watch?v=")) {
                     const youtubeEmbed = data.video.replace("watch?v=", "embed/");
-                    videoFrame.src = youtubeEmbed + "?autoplay=1&controls=0";
+                    if (videoFrame.src !== youtubeEmbed + "?autoplay=1&controls=0") {
+                        videoFrame.src = youtubeEmbed + "?autoplay=1&controls=0"; // Yeni video ataması
+                    }
                     videoFrame.style.display = "block"; // Video geldiğinde göster
                     waitingText.style.display = "none"; // "Waiting for video..." yazısını gizle
                 } else {
@@ -61,4 +63,3 @@
     </script>
 </body>
 </html>
-
