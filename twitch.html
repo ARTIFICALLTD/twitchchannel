@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBS Video Player</title>
+</head>
+<body style="margin:0; overflow:hidden; display:flex; align-items:center; justify-content:center; height:100vh; background-color:black;">
+    <iframe id="videoFrame" width="1280" height="720" frameborder="0" allowfullscreen></iframe>
+
+    <script>
+        async function updateVideo() {
+            try {
+                const response = await fetch("http://localhost:3000/current-video");
+                const data = await response.json();
+                const videoFrame = document.getElementById("videoFrame");
+
+                if (data.video) {
+                    const youtubeEmbed = data.video.replace("watch?v=", "embed/");
+                    videoFrame.src = youtubeEmbed + "?autoplay=1&controls=0";
+                }
+            } catch (error) {
+                console.error("Video güncellenirken hata oluştu:", error);
+            }
+        }
+
+        setInterval(updateVideo, 5000); // Her 5 saniyede bir video kontrol et
+        updateVideo();
+    </script>
+</body>
+</html>
