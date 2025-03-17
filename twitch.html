@@ -4,8 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OBS Video Player</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 32px;
+            text-align: center;
+        }
+        #waitingText {
+            position: absolute;
+        }
+        #videoFrame {
+            display: none; /* Başlangıçta videoyu gizle */
+        }
+    </style>
 </head>
-<body style="margin:0; overflow:hidden; display:flex; align-items:center; justify-content:center; height:100vh; background-color:black;">
+<body>
+    <div id="waitingText">Waiting for video...</div>
     <iframe id="videoFrame" width="1280" height="720" frameborder="0" allowfullscreen></iframe>
 
     <script>
@@ -14,10 +36,16 @@
                 const response = await fetch("http://localhost:3000/current-video");
                 const data = await response.json();
                 const videoFrame = document.getElementById("videoFrame");
+                const waitingText = document.getElementById("waitingText");
 
                 if (data.video) {
                     const youtubeEmbed = data.video.replace("watch?v=", "embed/");
                     videoFrame.src = youtubeEmbed + "?autoplay=1&controls=0";
+                    videoFrame.style.display = "block"; // Video geldiğinde göster
+                    waitingText.style.display = "none"; // "Waiting for video..." yazısını gizle
+                } else {
+                    videoFrame.style.display = "none"; // Video yoksa gizle
+                    waitingText.style.display = "block"; // "Waiting for video..." yazısını göster
                 }
             } catch (error) {
                 console.error("Video güncellenirken hata oluştu:", error);
@@ -29,3 +57,4 @@
     </script>
 </body>
 </html>
+
