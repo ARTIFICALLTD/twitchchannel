@@ -64,7 +64,6 @@
                 const { video } = await response.json();
                 
                 if(!video) {
-                    // Videoyu ve sesi tamamen durdur
                     if(currentVideoId) {
                         playerElement.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*');
                         playerElement.src = "about:blank";
@@ -74,28 +73,26 @@
                     document.getElementById("waitingText").style.display = "block";
                     return;
                 }
-
+    
                 const videoId = new URL(video).searchParams.get("v");
                 
                 if(videoId !== currentVideoId) {
-                    // Eski videoyu tamamen temizle
                     if(currentVideoId) {
                         playerElement.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*');
                     }
                     
-                    // Yeni videoyu yükle
                     currentVideoId = videoId;
-                    playerElement.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&origin=${window.location.origin}&controls=0&rel=0&${Date.now()}`;
+                    playerElement.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&controls=0&rel=0&${Date.now()}`;
                     
                     playerElement.style.display = "block";
                     document.getElementById("waitingText").style.display = "none";
                 }
-
+    
             } catch(error) {
                 console.error("Error:", error);
             }
         }
-
+    
         setInterval(checkVideo, 2000);
         checkVideo();
     </script>
