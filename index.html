@@ -22,13 +22,14 @@
             position: absolute;
         }
         #videoFrame {
-            display: none; /* Başlangıçta videoyu gizle */
+            display: none;
+            border: none;
         }
     </style>
 </head>
 <body>
     <div id="waitingText">Waiting for video...</div>
-    <iframe id="videoFrame" width="1280" height="720" frameborder="0" allowfullscreen></iframe>
+    <iframe id="videoFrame" width="1280" height="720" allow="autoplay; fullscreen"></iframe>
 
     <script>
         async function updateVideo() {
@@ -38,28 +39,36 @@
                 const videoFrame = document.getElementById("videoFrame");
                 const waitingText = document.getElementById("waitingText");
 
-                // Boş veya geçersiz video URL'sini kontrol edelim
-                if (data.video && data.video.trim() !== "" && data.video.includes("youtube.com/watch?v=")) {
-                    const youtubeEmbed = data.video.replace("watch?v=", "embed/");
-                    if (videoFrame.src !== youtubeEmbed + "?autoplay=1&controls=0") {
-                        videoFrame.src = youtubeEmbed + "?autoplay=1&controls=0"; // Yeni video ataması
+                // Gelişmiş YouTube URL kontrolü
+                const youtubeRegex = /^https?:\/\/(www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&|$)/;
+                const match = data.video ? data.video.match(youtubeRegex) : null;
+                
+                if (match) {
+                    const videoId = match[2];
+                    const youtubeEmbed = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0`;
+                    
+                    if (videoFrame.src !== youtubeEmbed) {
+                        videoFrame.src = youtubeEmbed;
                     }
-                    videoFrame.style.display = "block"; // Video geldiğinde göster
-                    waitingText.style.display = "none"; // "Waiting for video..." yazısını gizle
+                    
+                    videoFrame.style.display = "block";
+                    waitingText.style.display = "none";
                 } else {
-                    videoFrame.style.display = "none"; // Video yoksa gizle
-                    waitingText.style.display = "block"; // "Waiting for video..." yazısını göster
-                    videoFrame.src = ""; // Gereksiz boş iframe yüklenmesini önler
+                    videoFrame.style.display = "none";
+                    waitingText.style.display = "block";
+                    videoFrame.src = "about:blank"; // Iframe'i tamamen boşalt
                 }
             } catch (error) {
-                console.error("Video güncellenirken hata oluştu:", error);
-                videoFrame.style.display = "none"; // Hata olursa da video iframe'ini gizle
-                waitingText.style.display = "block"; // "Waiting for video..." yazısını göster
+                console.error("Hata:", error);
+                videoFrame.style.display = "none";
+                waitingText.style.display = "block";
+                videoFrame.src = "about:blank";
             }
         }
 
-        setInterval(updateVideo, 5000); // Her 5 saniyede bir video kontrol et
+        // İlk kontrolü hemen yap ve 5 saniyede bir tekrarla
         updateVideo();
+        setInterval(updateVideo, 5000);
     </script>
 </body>
 </html>
