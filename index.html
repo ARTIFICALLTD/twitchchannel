@@ -32,6 +32,8 @@
     <iframe id="videoFrame" width="1280" height="720" allow="autoplay; fullscreen"></iframe>
 
     <script>
+        let videoTimeout = null; // Video zamanlayıcısı için referans
+
         async function updateVideo() {
             try {
                 const response = await fetch("https://gamerportsocketio3.onrender.com/current-video");
@@ -39,7 +41,6 @@
                 const videoFrame = document.getElementById("videoFrame");
                 const waitingText = document.getElementById("waitingText");
 
-                // Gelişmiş YouTube URL kontrolü
                 const youtubeRegex = /^https?:\/\/(www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&|$)/;
                 const match = data.video ? data.video.match(youtubeRegex) : null;
                 
@@ -48,27 +49,49 @@
                     const youtubeEmbed = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0`;
                     
                     if (videoFrame.src !== youtubeEmbed) {
+                        // Yeni video yüklendiğinde zamanlayıcıyı sıfırla
                         videoFrame.src = youtubeEmbed;
+                        resetVideoTimer();
                     }
                     
                     videoFrame.style.display = "block";
                     waitingText.style.display = "none";
                 } else {
+                    // Video yoksa zamanlayıcıyı temizle
+                    clearVideoTimer();
                     videoFrame.style.display = "none";
                     waitingText.style.display = "block";
-                    videoFrame.src = "about:blank"; // Iframe'i tamamen boşalt
+                    videoFrame.src = "about:blank";
                 }
             } catch (error) {
                 console.error("Hata:", error);
+                clearVideoTimer();
                 videoFrame.style.display = "none";
                 waitingText.style.display = "block";
                 videoFrame.src = "about:blank";
             }
         }
 
-        // İlk kontrolü hemen yap ve 5 saniyede bir tekrarla
+        function resetVideoTimer() {
+            // Önceki zamanlayıcıyı temizle
+            clearVideoTimer();
+            // 20 saniye sonra yeni video kontrolü yap
+            videoTimeout = setTimeout(() => {
+                videoFrame.src = "about:blank"; // Mevcut videoyu durdur
+                updateVideo();
+            }, 20000);
+        }
+
+        function clearVideoTimer() {
+            if (videoTimeout) {
+                clearTimeout(videoTimeout);
+                videoTimeout = null;
+            }
+        }
+
+        // İlk yükleme ve periyodik kontrol
         updateVideo();
-        setInterval(updateVideo, 5000);
+        setInterval(updateVideo, 5000); // Sunucuyla senkronizasyon için
     </script>
 </body>
 </html>
