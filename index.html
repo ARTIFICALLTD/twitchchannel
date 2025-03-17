@@ -40,45 +40,41 @@
     </div>
 
     <script>
-        let currentVideoId = null;
-
+        let currentVideoId = "";
+        
         async function checkVideo() {
             try {
                 const response = await fetch("https://gamerportsocketio3.onrender.com/current-video");
                 const { video } = await response.json();
-
-                const player = document.getElementById("ytPlayer");
-                const waitingText = document.getElementById("waitingText");
-
-                if (!video) {
-                    player.style.display = "none";
-                    waitingText.style.display = "block";
+                
+                if(!video) {
+                    document.getElementById("ytPlayer").style.display = "none";
+                    document.getElementById("waitingText").style.display = "block";
+                    currentVideoId = ""; // Resetleme eklendi
                     return;
                 }
-
-                const urlParams = new URL(video).searchParams;
-                const videoId = urlParams.get("v");
-
-                // **Eğer video değişmemişse bile tekrar oynat**
-                if (videoId) {
+    
+                const videoId = new URL(video).searchParams.get("v");
+                const player = document.getElementById("ytPlayer");
+                
+                // Aynı video bile olsa zorla yenile
+                if(videoId !== currentVideoId || player.src === "about:blank") {
                     currentVideoId = videoId;
-                    player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&origin=${window.location.origin}&controls=0&rel=0`;
-
+                    player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&origin=${window.location.origin}&controls=0&rel=0&${Date.now()}`;
+                    
                     player.style.display = "block";
-                    waitingText.style.display = "none";
-
-                    // **YouTube API ile sesi aç**
+                    document.getElementById("waitingText").style.display = "none";
+                    
                     setTimeout(() => {
-                        player.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                        player.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
                     }, 2000);
                 }
-
-            } catch (error) {
+    
+            } catch(error) {
                 console.error("Error:", error);
             }
         }
-
-        // **Her 2 saniyede bir video kontrolü yap**
+    
         setInterval(checkVideo, 2000);
         checkVideo();
     </script>
