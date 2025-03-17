@@ -1,46 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBS Video Player</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        #waitingText {
-            position: absolute;
-            color: white;
-            font-family: Arial, sans-serif;
-            font-size: 32px;
-        }
-        #ytPlayer {
-    max-width: 100%;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    aspect-ratio: 16/9;
-}
-    </style>
-</head>
-<body>
-    <div id="videoContainer">
-        <div id="waitingText">Waiting for video...</div>
-        <iframe 
-            id="ytPlayer"
-            width="1280" 
-            height="720"
-            frameborder="0"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowfullscreen>
-        </iframe>
-    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OBS Video Player</title>
+        <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+                background: black;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                width: 100vw; /* Yeni eklendi */
+            }
+            #waitingText {
+                color: white;
+                font-family: Arial, sans-serif;
+                font-size: 32px;
+                position: absolute;
+            }
+            #ytPlayer {
+                display: none;
+                border: none;
+                margin: 0 auto; /* Yeni eklendi */
+                position: relative; /* Yeni eklendi */
+                left: 0; /* Yeni eklendi */
+                transform: none; /* Yeni eklendi */
+            }
+            
+            /* Yeni eklenen responsive container */
+            #videoContainer {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="videoContainer">
+            <div id="waitingText">Waiting for video...</div>
+            <iframe 
+                id="ytPlayer"
+                width="1280" 
+                height="720"
+                frameborder="0"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
 
     <script>
         let currentVideoId = "";
